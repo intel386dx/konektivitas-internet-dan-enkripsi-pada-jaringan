@@ -8,7 +8,7 @@
         <style>
         	button {
                 background-color: #e0e0e0;
-                border: 0px solid;
+                border: 1px solid #c0c0c0;
                 transition-duration: 0.25s;
             }
             button.little {
@@ -33,11 +33,17 @@
                 left: 0px;
                 background-color: white;
                 background-color: rgba(255, 255, 255, 0.75);
+                border: 0px solid;
                 border-radius: 0px;
                 transition-duration: 0.5s;
                 z-index: 999;
                 overflow: hidden;
                 box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+                -webkit-backdrop-filter: blur(4px);
+                backdrop-filter: blur(4px);
+            }
+            .toolbar *:not(button){
+                text-shadow: 0px 0px 4px rgba(255, 255, 255, 1);
             }
             .toolbar:hover {
                 background-color: rgba(255, 255, 255, 0.875);
@@ -45,32 +51,35 @@
             }
             .toolbar.top {
             	top: 0px;
+                border-bottom: 1px solid white;
+                border-bottom-color: rgba(255, 255, 255, 0.5)
             }
             .toolbar.top.hidden {
                 transform: translateY(100%)
             }
             .toolbar.below {
             	bottom: 0px;
+                border-top: 1px solid white;
+                border-top-color: rgba(255, 255, 255, 0.5)
             }
             .toolbar.bottom.hidden {
                 transform: translateY(-100%)
             }
-            .toolbar.collapse {
+            body.toolbar-collapse .toolbar:not(.below) {
             	max-width: 40px;
                 max-height: 40px;
                 border-radius: 20px;
                 opacity: 0.5;
             }
-            .toolbar.top.collapse {
+            body.toolbar-collapse .toolbar.top {
             	top: 8px;
                 left: 8px;
             }
             .toolbar.top.hidden {
             	top: -100%;
             }
-            .toolbar.below.collapse {
-                bottom: 8px;
-                left: 8px;
+            body.toolbar-collapse .toolbar.below:not(.hidden) {
+                bottom: -100%;
             }
             .toolbar.below.hidden {
             	bottom: -100%;
@@ -117,10 +126,10 @@
                 height: 50%;
                 transform: rotateY(-180deg)
             }
-            .toolbar.collapse .chevron {
+            body.toolbar-collapse .toolbar .chevron {
             	transform: rotateY(0deg)
             }
-            .toolbar.collapse .toolbox {
+            body.toolbar-collapse .toolbar .toolbox {
             	opacity: 0;
             }
             .toolbar .toggle {
@@ -130,12 +139,30 @@
             	border-radius: 20px;
             }
             .scrollers {
+            	width: 100%;
                 display: flex;
+                align-items: center;
                 flex-direction: row;
                 gap: 4px
             }
             .scrollers input[type=range] {
                 flex: 1 1;
+                width: 100%;
+            }
+            .scrollers input[type=range]::-webkit-slider-runnable-track,
+            .scrollers input[type=range]::-moz-range-track,
+            .scrollers input[type=range]::-ms-track {
+            	background-color: transparent;
+            }
+            .scroller {
+                width: 100%;
+            	display: flex; 
+				flex-direction: row; 
+				align-items: center; 
+				gap: 4px
+            }
+            .scroller.reverse {
+            	flex-direction: row-reverse;
             }
             #name {
                 font-size: 12pt;
@@ -146,15 +173,16 @@
             #ispring {
             	border: 0px solid;
             }
-            #x-scroller {
-            	accent-color: gray;
-                width: 100%;
+            @media only screen and (max-width: 480px) {
+            	.scrollers { flex-direction: column }
+            	.scroller { display: flex; flex-direction: row; align-items: center; gap: 4px }
+            	.scroller.reverse { flex-direction: row }
             }
         </style>
     </head>
-    <body>
+    <body id="body">
     	<div class="toolbar top" id="scroll">
-    	    <button class="toggle" onclick="document.getElementById('scroll').classList.toggle('collapse')">
+    	    <button class="toggle" onclick="document.getElementById('body').classList.toggle('toolbar-collapse')">
     	        <img src="data/chevron.png" class="chevron">
             </button>
             <div class="toolbox">
@@ -172,15 +200,22 @@
         <div class="main" id="mainframe">
             <iframe id="ispring" src="ispring.htm" width="640" height="480"></iframe>
         </div>
-        <div class="toolbar below" id="scroll-toolbar" style="height:54px">
+        <div class="toolbar below" id="scroll-toolbar" style="height:auto">
             <div class="toolbox" style="flex-direction:column;align-items:center;padding:8px">
-            	<div>
+            	<!-- <div>
                     <label for="x-scroller" style="display:inline-block;margin:2px">Scroll bar</label>
-                    <button class="little" id="reset-scroller" onclick="document.getElementById('x-scroller').value = 0">Reset</button>
-                </div>
+                    <button class="little" id="reset-scroller" onclick="resetScrollers()">Reset</button>
+                </div> -->
                 <div style="width:100%" class="scrollers">
-                    <input type="range" id="x-scroller" min="-60" max="60">
-                    <input type="range" id="y-scroller" min="-60" max="60">
+                    <div class="scroller">
+                    	<label for="x-scroller">X</label>
+						<input type="range" id="x-scroller" min="-60" max="60">
+					</div>
+                    <button class="little" id="reset-scroller" onclick="resetScrollers()">Reset</button>
+                    <div class="scroller reverse">
+                    	<label for="y-scroller">Y</label>
+						<input type="range" id="y-scroller" min="-60" max="60">
+					</div>
                 </div>
             </div>
     	</div>
